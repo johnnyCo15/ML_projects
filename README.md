@@ -1,2 +1,3 @@
 # ML-projects
-Consolidated set of personal ML projects 
+ML projects/ python practice 
+
