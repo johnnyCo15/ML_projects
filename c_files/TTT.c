@@ -1,5 +1,4 @@
 // code for tictactoe game with two human players
-// not ML
 
 #include <stdio.h>
 #include <stdlib.h>
