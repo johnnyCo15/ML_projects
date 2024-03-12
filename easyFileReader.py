@@ -1,4 +1,4 @@
-
+import pandas as pd 
 
 def file_path_getter():
     file_path = input("Enter the path of txt file: ")
