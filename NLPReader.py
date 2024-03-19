@@ -1,6 +1,8 @@
 import spacy
 import pandas as pd
 
+# run source venv/bin/activate before running
+
 # asks user for file path
 def file_finder():
     file_path = input("Enter the path of txt file: ")
