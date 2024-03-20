@@ -29,3 +29,12 @@ print("newest house [yrs]: ", newest_house)
 # dropping values
 # dropna drops missing values (think of na as "not available")
 melbourne_data = melbourne_data.dropna(axis = 0)
+
+# prediction target
+y = melbourne_data.Price
+
+# choosing features 
+melbourne_features = ['Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude']
+X = melbourne_data[melbourne_features]
+
+print(X.describe())
