@@ -1,5 +1,7 @@
 import pandas as pd 
 
+# run source venv/bin/activate before running
+
 # save file path
 melbourne_file_path = '/Users/jonnguyen/Downloads/GITHUB/ML_projects/melb_data.csv'
 
@@ -38,3 +40,21 @@ melbourne_features = ['Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude'
 X = melbourne_data[melbourne_features]
 
 print(X.describe())
+print(X.head())
+
+# building the model 
+from sklearn.tree import DecisionTreeRegressor
+
+# define model 
+# specifying number to ensure same result for each run
+melbourne_model = DecisionTreeRegressor(random_state = 1)
+
+# fit model 
+melbourne_model.fit(X, y)
+
+print("Making predictions for the following 5 houses:")
+print(X.head())
+print("The predictions are")
+print(melbourne_model.predict(X.head()))
+print("---------------------------------")
+print(melbourne_model.predict(X))
