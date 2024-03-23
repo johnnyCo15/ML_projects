@@ -58,3 +58,33 @@ print("The predictions are")
 print(melbourne_model.predict(X.head()))
 print("---------------------------------")
 print(melbourne_model.predict(X))
+
+# model validation 
+from sklearn.metrics import mean_absolute_error
+
+predicted_home_prices = melbourne_model.predict(X)
+print(mean_absolute_error(y, predicted_home_prices))
+
+
+from sklearn.model_selection import train_test_split
+
+# split data into training and validation data 
+# split based on rand num generator
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 0)
+
+# define the model 
+melbourne_model = DecisionTreeRegressor()
+
+# fit model 
+melbourne_model.fit(train_X, train_y)
+
+# get predicted prices on validation data 
+val_predictions = melbourne_model.predict(val_X)
+print("value prediction: ", val_predictions)
+
+print("-----------------------------------------")
+val_mae = mean_absolute_error(val_y, val_predictions)
+print(val_mae)
+
+
+
