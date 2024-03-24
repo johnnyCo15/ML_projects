@@ -90,17 +90,24 @@ print("-----------------------------------------")
 # rewriting previous code to function for reusability 
 def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
     model = DecisionTreeRegressor(max_leaf_nodes = max_leaf_nodes, random_state = 0)
+    # when fitting final model, use X and y instead of train_X, train_y
     model.fit (train_X, train_y)
     predicted_val = model.predict(val_X)
     mae = mean_absolute_error(val_y, predicted_val)
     return (mae)
 
 # compare mae w differing values of max_leaf_nodes 
+mae_dict = {}
 for max_leaf_nodes in [5, 50, 500, 5000]:
     my_mae = get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y)
+    # assign mae value to corresponding key in dict 
+    mae_dict[max_leaf_nodes] = my_mae
     print("Max leaf nodes: %d  \t\t Mean Absolute Error:  %d" %(max_leaf_nodes, my_mae))
 
-# of the options of leaves listed, 500 is the most optimal(smallest MAE)
+# finding key w min mae
+best_max_leaf_nodes = min(mae_dict, key = mae_dict.get)
+print("Best value of max leaf nodes:", best_max_leaf_nodes, "with mae: ", mae_dict[best_max_leaf_nodes])
+
 
 
 
