@@ -80,11 +80,29 @@ melbourne_model.fit(train_X, train_y)
 
 # get predicted prices on validation data 
 val_predictions = melbourne_model.predict(val_X)
-print("value prediction: ", val_predictions)
-
-print("-----------------------------------------")
+# print("value prediction: ", val_predictions)
 val_mae = mean_absolute_error(val_y, val_predictions)
 print(val_mae)
+print("-----------------------------------------")
+
+# under and overfitting 
+# using utility function to compare mae scores 
+# rewriting previous code to function for reusability 
+def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
+    model = DecisionTreeRegressor(max_leaf_nodes = max_leaf_nodes, random_state = 0)
+    model.fit (train_X, train_y)
+    predicted_val = model.predict(val_X)
+    mae = mean_absolute_error(val_y, predicted_val)
+    return (mae)
+
+# compare mae w differing values of max_leaf_nodes 
+for max_leaf_nodes in [5, 50, 500, 5000]:
+    my_mae = get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y)
+    print("Max leaf nodes: %d  \t\t Mean Absolute Error:  %d" %(max_leaf_nodes, my_mae))
+
+# of the options of leaves listed, 500 is the most optimal(smallest MAE)
+
+
 
 
 
