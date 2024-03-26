@@ -56,7 +56,7 @@ print("Making predictions for the following 5 houses:")
 print(X.head())
 print("The predictions are")
 print(melbourne_model.predict(X.head()))
-print("---------------------------------")
+print("-----------------------------------------")
 print(melbourne_model.predict(X))
 
 # model validation 
@@ -107,9 +107,13 @@ for max_leaf_nodes in [5, 50, 500, 5000]:
 # finding key w min mae
 best_max_leaf_nodes = min(mae_dict, key = mae_dict.get)
 print("Best value of max leaf nodes:", best_max_leaf_nodes, "with mae: ", mae_dict[best_max_leaf_nodes])
+print("-----------------------------------------")
 
+# random forests 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
 
-
-
-
-
+forest_model = RandomForestRegressor(random_state = 1)
+forest_model.fit(train_X, train_y)
+mel_predictions = forest_model.predict(val_X)
+print(mean_absolute_error(val_y, mel_predictions))
