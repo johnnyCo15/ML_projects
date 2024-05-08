@@ -13,7 +13,7 @@ def file_reader(file_path):
     except Exception as e: 
         print(f"Error has occurred while reading file: (e)")
         return None
-
+    
 def main():
     file_path = file_path_getter()
     file_content = file_reader(file_path)
