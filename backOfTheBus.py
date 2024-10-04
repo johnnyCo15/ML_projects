@@ -3,6 +3,10 @@
 import pandas as pd 
 import spacy as sp 
 
-file_path = '/Users/jonnguyen/Downloads/kaggle_bot_accounts.csv'
+
+file_path = ('')
 bot = pd.read_csv(file_path)
 print(bot.describe())
+
+
+
