@@ -1,0 +1,22 @@
+    key                                              value                                          locations
+0     1  Cartography, the intricate science and art of ...                                                   
+1     2                                                                                                      
+2     3  In ancient Japan, for instance, maps often dep...                                              Japan
+3     4                                                                                                      
+4     5  Similarly, medieval European cartography, epit...                                    Jerusalem, East
+5     6                                                                                                      
+6     7  Prior to the 15th-century renaissance of Ptole...                          Europe, Arctic, Antarctic
+7     8                                                                                                      
+8     9  In regions as diverse as Egypt and Brazil, car...       Egypt, Brazil, Egypt, the Nile River, Brazil
+9    10                                                                                                      
+10   11  The London Underground map, a masterpiece of m...                                                   
+11   12                                                                                                      
+12   13  Beyond spatial representation, maps serve as p...                                     Russia, Crimea
+13   14                                                                                                      
+14   15  Similarly, both India and China assert their t...                                       India, China
+15   16                                                                                                      
+16   17  Moreover, the term "United States" encompasses...  United States, Alaska, Hawaii, The United Stat...
+17   18                                                                                                      
+18   19  The boundary between the United States and Can...                          the United States, Canada
+19   20                                                                                                      
+20   21  This rich and multifaceted tapestry of cartogr...                                                   

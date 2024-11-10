@@ -38,7 +38,14 @@ def main():
     text_dict = file_opener(file_path)
     locations = extract_location(text_dict)
     df = create_df(text_dict, locations)
-    print(df)
+
+    try:
+        file = open("nlp_output.txt", "x")
+    except:
+        file = open("nlp_output.txt", "w")
+    
+    file.write(str(df))
+    file.close
 
 
 if __name__ == "__main__":
