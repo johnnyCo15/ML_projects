@@ -26,7 +26,7 @@ def scrape_images(url, writer):
         
         # if 'PICT' in img_url and img_url not in seen_urls: 
         #     seen_urls.add(img_url)
-        if 'PICT' in img_url or 'LOOK': 
+        if any (keyword in img_url for keyword in ['PICT', 'LOOK', 'HOMME']): 
 
             # write image url, season, and year to csv
             writer.writerow({'URL': img_url, 'SEASON': season, 'YEAR': year})
