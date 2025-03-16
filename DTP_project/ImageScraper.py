@@ -2,6 +2,8 @@
 # run "source venv/bin/activate" in ML_projects folder
 
 import requests
+import asyncio
+import aiohttp
 import csv 
 import re
 from bs4 import BeautifulSoup
@@ -48,11 +50,7 @@ def scrape_images(url, writer):
 
 # extract szn/ yr using regex
 def parse_season_year(url):
-    # match = re.search(r'\/(autumn-winter|spring-summer)-(\d{4})(?:-(\d{2}|\d{4}))?-yyh', url)
-    # match = re.search(r'\/(autumn-winter|spring-summer)-(\d{4})(?:-(\d{2}|\d{4}))?', url)
     match = re.search(r'\/(autumn-winter|spring-summer)-(\d{4})(?:-(\d{4}))?', url)
-
-
 
     if match: 
         season = match.group(1).capitalize()
