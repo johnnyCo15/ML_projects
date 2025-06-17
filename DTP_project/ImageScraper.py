@@ -8,112 +8,157 @@ import csv
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import logging
+import os
+import time
 
-def getData(url):
-    try: 
-        r = requests.get(url)
-        r.raise_for_status()
-        return r.text
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching {url}: {e}")
-        return None
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# def scrape_images(url, seen_urls, writer):
-def scrape_images(url, writer):
-    htmldata = getData(url) 
-
-    if not htmldata:
-        return # skipping if no data fetched 
+def get_page_content(url):
+    """Fetch the webpage content with error handling and retries."""
+    max_retries = 3
+    retry_delay = 2  # seconds
     
-    soup = BeautifulSoup(htmldata, 'html.parser')
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            return response.text
+        except requests.RequestException as e:
+            if attempt < max_retries - 1:
+                print(f"Attempt {attempt + 1} failed: {str(e)}. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"Failed to fetch {url} after {max_retries} attempts: {str(e)}")
+                return None
 
-    # extracting season/ year from url
-    season, year = parse_season_year(url)
-
-    if not season or not year: 
-        print(f"Could not parse season/ year from URL: {url}")
+def extract_season_year_from_url(url):
+    """Extract season and year information from the URL."""
+    # Pattern to match both old and new URL formats
+    pattern = r'/(spring-summer|autumn-winter)-(\d{4})(?:-\d{2})?'
+    match = re.search(pattern, url.lower())
     
-    # scrape image urls + add to csv
-    for item in soup.find_all('img'):
-        img_url = item.get('src', '') or item.get('data-src')
-
-        # checks if img_url is None and converts relative URL to absolute
-        if img_url:
-            img_url = urljoin(url, img_url)
-        
-        # if 'PICT' in img_url and img_url not in seen_urls: 
-        #     seen_urls.add(img_url)
-        if any (keyword in img_url for keyword in ['PICT', 'LOOK', 'HOMME']): 
-            # write image url, season, and year to csv
-            writer.writerow({'URL': img_url, 'SEASON': season, 'YEAR': year})
-            # print(f"added: URL: {img_url} | SEASON: {season} | YEAR: {year}")
-
-# extract szn/ yr using regex
-def parse_season_year(url):
-    match = re.search(r'\/(autumn-winter|spring-summer)-(\d{4})(?:-(\d{4}))?', url)
-
-    if match: 
-        season = match.group(1).capitalize()
-        year_start = match.group(2) 
-        year_end = match.group(3)
-    
-        if year_end:
-            #  if there is an end yr
-            year = f"{year_start}-{year_end}"
-        else: 
-            # if there is no end yr, just use start yr
-            year = year_start
-
+    if match:
+        season = match.group(1)  # spring-summer or autumn-winter
+        year = match.group(2)    # year
         return season, year
-    else: 
-        # return none if szn/ yr cannot be parsed
-        return None, None
+    return None, None
 
-def readURLs(file_path):
-    try:
-        with open(file_path, 'r') as file:
-                urls = file.read().splitlines()
-        return(urls)
-    except FileNotFoundError:
-        print(f"Error: {file_path} not found.")
+def is_fashion_look_image(img_url):
+    """Check if the image is a fashion look image."""
+    # Exclude common non-fashion image patterns
+    exclude_patterns = [
+        'wp-content/themes',  # Theme images
+        'sns',               # Social media icons
+        'icon',             # Icons
+        'logo',             # Logos
+        'banner',           # Banners
+        'background',       # Background images
+        'menu',            # Menu images
+        'footer',          # Footer images
+        'header'           # Header images
+        'brand'          # brand images
+    ]
+    
+    # Check if URL contains any exclude patterns
+    if any(pattern in img_url.lower() for pattern in exclude_patterns):
+        return False
+    
+    # Include patterns specific to fashion look images
+    include_patterns = [
+        'look',            # Look images
+        'collection',      # Collection images
+        'homme'           # Men's collection
+    ]
+    
+    # Check if URL contains any include patterns
+    if any(pattern in img_url.lower() for pattern in include_patterns):
+        return True
+    
+    # If the URL contains a number (likely a look number)
+    if re.search(r'\d+', img_url):
+        return True
+    
+    return False
+
+def scrape_images(url):
+    """Scrape all images from the given URL."""
+    print(f"\nProcessing URL: {url}")
+    
+    # Extract season and year from URL
+    season, year = extract_season_year_from_url(url)
+    if not season or not year:
+        print(f"Could not extract season/year from URL: {url}")
         return []
     
-# create csv with "URL/ SEASON/ YEAR" headers
-def csv_create():
-    csv_filepath = 'working.csv'
-    with open(csv_filepath, mode = 'w', newline = '') as file:
-        fieldnames = ['URL', 'SEASON', 'YEAR']
-        writer = csv.DictWriter(file, fieldnames = fieldnames)
+    print(f"Extracted season: {season}, year: {year}")
+    
+    # Get page content
+    content = get_page_content(url)
+    if not content:
+        return []
+    
+    # Parse HTML
+    soup = BeautifulSoup(content, 'html.parser')
+    
+    # Find all image elements
+    images = []
+    for img in soup.find_all('img'):
+        src = img.get('src')
+        if src:
+            # Convert relative URLs to absolute
+            full_url = urljoin(url, src)
+            # Only include fashion look images
+            if is_fashion_look_image(full_url):
+                images.append({
+                    'url': full_url,
+                    'season': season,
+                    'year': year
+                })
+    
+    print(f"Found {len(images)} fashion look images")
+    return images
+
+def write_to_csv(images, filename='yohji_images.csv'):
+    """Write image data to CSV file."""
+    if not images:
+        print("No images to write to CSV")
+        return
+    
+    # Write to CSV
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=['url', 'season', 'year'])
         writer.writeheader()
-
-    print(f"CSV file: {csv_filepath} created")
-
+        writer.writerows(images)
+    
+    print(f"Successfully wrote {len(images)} images to {filename}")
 
 def main():
-    print("Starting scraper...")
+    # Get the directory where the script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    urls_file = os.path.join(script_dir, 'yohji_urls.txt')
     
-    file_path = "yohji_urls.txt"
-    # read urls from file 
-    urls = readURLs(file_path) 
-    # seen_urls = set()
-
-    if not urls:
-        return #exit if no URLS
-
-    # create csv file
-    csv_create()
-
-    # open csv file to write
-    with open('working.csv', mode = 'a', newline = '') as file:
-        fieldnames = ['URL', 'SEASON', 'YEAR']
-        writer = csv.DictWriter(file, fieldnames = fieldnames)
-
-        for url in urls: 
-        # print(f"Processing URL: {url}")
-            # scrape_images(url, seen_urls, writer)
-            scrape_images(url, writer)
-
-    print("Scraping finished.")
+    # Read URLs from file
+    try:
+        with open(urls_file, 'r', encoding='utf-8') as f:
+            urls = [line.strip() for line in f if line.strip()]
+    except FileNotFoundError:
+        print("Error: yohji_urls.txt not found")
+        return
+    
+    print(f"Found {len(urls)} URLs to process")
+    
+    # Process each URL
+    all_images = []
+    for url in urls:
+        images = scrape_images(url)
+        all_images.extend(images)
+        time.sleep(1)  # Be nice to the server
+    
+    # Write all images to CSV
+    write_to_csv(all_images)
 
 if __name__ == "__main__":
     main()

@@ -144,19 +144,47 @@ class FashionDataProcessor:
 
     def _extract_color_histogram(self, image):
         """Extract color histogram features"""
-        hist = cv2.calcHist([image], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
-        return cv2.normalize(hist, hist).flatten()
+        try:
+            # Convert to uint8 for OpenCV operations
+            image_uint8 = (image * 255).astype(np.uint8)
+            # Ensure image is in BGR format for OpenCV
+            if len(image_uint8.shape) == 3:
+                image_bgr = cv2.cvtColor(image_uint8, cv2.COLOR_RGB2BGR)
+                hist = cv2.calcHist([image_bgr], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+                return cv2.normalize(hist, hist).flatten()
+            return None
+        except Exception as e:
+            self.logger.error(f"Error in color histogram extraction: {str(e)}")
+            return None
 
     def _extract_texture_features(self, image):
         """Extract texture features using GLCM"""
-        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        return cv2.Laplacian(gray, cv2.CV_64F).var()
+        try:
+            # Convert to uint8 for OpenCV operations
+            image_uint8 = (image * 255).astype(np.uint8)
+            # Convert to grayscale properly
+            if len(image_uint8.shape) == 3:
+                gray = cv2.cvtColor(image_uint8, cv2.COLOR_RGB2GRAY)
+                return cv2.Laplacian(gray, cv2.CV_64F).var()
+            return None
+        except Exception as e:
+            self.logger.error(f"Error in texture feature extraction: {str(e)}")
+            return None
 
     def _extract_edge_features(self, image):
         """Extract edge features"""
-        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        edges = cv2.Canny(gray, 100, 200)
-        return np.mean(edges)
+        try:
+            # Convert to uint8 for OpenCV operations
+            image_uint8 = (image * 255).astype(np.uint8)
+            # Convert to grayscale properly
+            if len(image_uint8.shape) == 3:
+                gray = cv2.cvtColor(image_uint8, cv2.COLOR_RGB2GRAY)
+                edges = cv2.Canny(gray, 100, 200)
+                return np.mean(edges)
+            return None
+        except Exception as e:
+            self.logger.error(f"Error in edge feature extraction: {str(e)}")
+            return None
 
     def create_dataset(self, test_size=0.2, val_size=0.1, random_state=42):
         """

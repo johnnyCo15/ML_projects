@@ -12,11 +12,12 @@ def main():
     # Initialize data processor
     processor = FashionDataProcessor(
         image_size=(224, 224),
-        data_dir='../../data'  # Relative to the script location
+        data_dir='../data'  # This will create data directory in src folder
     )
     
     # Download images from CSV
-    csv_path = '../../working.csv'  # Path to your CSV file
+    csv_path = '../../working.csv'  # Updated path to point to working.csv in DTP_project directory
+    logger.info(f"Using CSV file at: {os.path.abspath(csv_path)}")
     logger.info("Downloading images...")
     processor.download_images(csv_path)
     
