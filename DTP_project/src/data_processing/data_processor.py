@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 import requests
 from tqdm import tqdm
 import logging
+import torch
 
 class FashionDataProcessor:
     def __init__(self, 
@@ -219,7 +220,7 @@ class FashionDataProcessor:
         return train_paths, val_paths, test_paths
 
 class FashionDataset(Dataset):
-    """Custom Dataset for fashion images"""
+    """Custom Dataset for fashion images with temporal features"""
     
     def __init__(self, image_paths, transform=None):
         self.image_paths = image_paths
@@ -229,15 +230,37 @@ class FashionDataset(Dataset):
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                               std=[0.229, 0.224, 0.225])
         ])
-
+        
+        # Extract temporal features from file paths
+        self.temporal_features = []
+        self.targets = []
+        
+        for path in image_paths:
+            # Extract season and year from path
+            # Example path: .../spring-summer_2024/image.jpg
+            season_year = os.path.basename(os.path.dirname(path))
+            season, year = season_year.split('_')
+            
+            # Convert season to numerical value (0 for spring-summer, 1 for autumn-winter)
+            season_value = 0 if 'spring' in season.lower() else 1
+            
+            # Convert year to numerical value (normalized)
+            year_value = (int(year) - 2000) / 25.0  # Normalize to [0, 1] range
+            
+            self.temporal_features.append([season_value, year_value])
+            self.targets.append(season_value)  # Predict next season
+    
     def __len__(self):
         return len(self.image_paths)
-
+    
     def __getitem__(self, idx):
         image_path = self.image_paths[idx]
         image = Image.open(image_path).convert('RGB')
         
         if self.transform:
             image = self.transform(image)
-            
-        return image 
+        
+        temporal_features = torch.tensor(self.temporal_features[idx], dtype=torch.float32)
+        target = torch.tensor(self.targets[idx], dtype=torch.long)
+        
+        return image, temporal_features, target 
