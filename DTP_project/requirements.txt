@@ -6,4 +6,6 @@ Pillow>=8.3.0
 opencv-python>=4.5.0
 scikit-learn>=0.24.0
 tqdm>=4.62.0
-requests>=2.26.0 
+requests>=2.26.0
+matplotlib>=3.4.0
+seaborn>=0.11.0 
