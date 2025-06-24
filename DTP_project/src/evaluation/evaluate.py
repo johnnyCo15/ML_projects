@@ -138,7 +138,7 @@ def main(args):
     setup_logging(args.log_dir)
     
     # Set device
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu"))
     logging.info(f'Using device: {device}')
     
     # Load model

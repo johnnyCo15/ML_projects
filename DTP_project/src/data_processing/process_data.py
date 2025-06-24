@@ -1,8 +1,10 @@
 import os
 import sys
 import logging
+import shutil
 from data_processor import FashionDataProcessor, FashionDataset
 from torch.utils.data import DataLoader
+import numpy as np
 
 def main():
     # Setup logging
@@ -68,6 +70,35 @@ def main():
             features = processor.extract_features(sample_image)
             logger.info("Successfully extracted features from sample image")
             logger.info(f"Feature types: {list(features.keys())}")
+
+    # After you get train_paths, val_paths, test_paths and processor is defined:
+    copy_split(train_paths, 'train', processor.processed_dir)
+    copy_split(val_paths, 'val', processor.processed_dir)
+    copy_split(test_paths, 'test', processor.processed_dir)
+
+    # After copying images to processed, extract and save features for each split
+    save_features(train_paths, 'train', processor)
+    save_features(val_paths, 'val', processor)
+    save_features(test_paths, 'test', processor)
+
+def copy_split(paths, split_name, processed_dir):
+    split_dir = os.path.join(processed_dir, split_name)
+    os.makedirs(split_dir, exist_ok=True)
+    for src_path in paths:
+        dst_path = os.path.join(split_dir, os.path.basename(src_path))
+        if not os.path.exists(dst_path):
+            shutil.copy2(src_path, dst_path)
+
+def save_features(paths, split_name, processor):
+    split_dir = os.path.join(processor.features_dir, split_name)
+    os.makedirs(split_dir, exist_ok=True)
+    for src_path in paths:
+        image = processor.preprocess_image(src_path)
+        if image is not None:
+            features = processor.extract_features(image)
+            if features is not None:
+                feature_path = os.path.join(split_dir, os.path.splitext(os.path.basename(src_path))[0] + '.npz')
+                np.savez_compressed(feature_path, **features)
 
 if __name__ == "__main__":
     main() 
