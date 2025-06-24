@@ -1,86 +1,102 @@
-Design Trend Predictor - The goal of this project is to utilize CNNs to predict future design trends based on a designer's previous works
+Design Trend Predictor
+=====================
+The goal of this project is to utilize CNNs to predict future design trends based on a designer's previous works.
 
 # Setup & Installation
 
-1. Create and activate your virtual environment:
+1. **Create and activate your virtual environment:**
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
-2. Install PyTorch (Apple Silicon/CPU):
+2. **Install PyTorch (Apple Silicon/CPU):**
    ```bash
    pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
    ```
-3. Install other requirements:
+3. **Install other requirements:**
    ```bash
    pip install -r requirements.txt
    ```
 
-# Current Designer(s):
-- Yohji Yamamoto
+# Pipeline Overview
 
-# Current Progress
-- [x] Image scraping from designer URLs
-- [x] Data download and organization
-- [x] Dataset splitting (train/val/test)
-- [x] Data pipeline and feature extraction
-- [x] Model architecture (CNN-based)
-- [x] Training framework with TensorBoard logging
-- [x] Evaluation and metrics reporting
-- [x] Prediction and analysis scripts
-- [ ] Advanced feature engineering (e.g., temporal/style features)
-- [ ] Model improvements (e.g., LSTM/Transformer integration)
-- [ ] Full data augmentation pipeline
-- [ ] Additional designers
+## 1. Image Scraping
+- **Script:** `ImageScraper.py`
+- **Command:**
+  ```bash
+  cd ML_projects/DTP_project
+  python ImageScraper.py
+  ```
+- **Output:** `yohji_images.csv` or `working.csv` with image URLs and metadata.
 
-# Project Roadmap
+## 2. Data Processing & Feature Extraction
+- **Script:** `src/data_processing/process_data.py`
+- **Command:**
+  ```bash
+  cd src/data_processing
+  python process_data.py
+  ```
+- **Output:**
+  - Images organized into `data/processed/train/`, `val/`, `test/`
+  - Features saved in `data/features/train/`, `val/`, `test/`
 
-## 1. Data Preprocessing and Organization
-- [x] Download and organize images from collected URLs
-- [x] Create dataset structure (train/val/test splits, consistent image sizes, labeling)
-- [ ] Implement data augmentation techniques specific to fashion images
+## 3. Model Training
+- **Script:** `src/training/train.py`
+- **Command:**
+  ```bash
+  cd ../training
+  python train.py --epochs 100 --batch_size 16 --num_workers 4 --learning_rate 0.001
+  ```
+- **Output:** Model checkpoints and logs in `logs/`
 
-## 2. Feature Engineering
-- [x] Extract basic features (color, pattern, silhouette, texture)
-- [ ] Create temporal features based on season/year information
-- [ ] Extract style elements specific to Yohji Yamamoto's work
+## 4. Model Evaluation
+- **Script:** `src/evaluation/evaluate.py`
+- **Command:**
+  ```bash
+  cd ../evaluation
+  python evaluate.py --model_path ../logs/best_model.pth --data_dir ../data --log_dir ../logs
+  ```
+- **Output:** Evaluation results and visualizations in `logs/`
 
-## 3. Model Architecture Development
-- [x] Design CNN architecture for fashion data
-- [ ] Integrate temporal modeling (LSTM/Transformer, attention)
+## 5. Prediction
+- **Script:** `src/prediction/predict.py`
+- **Command:**
+  ```bash
+  cd ../prediction
+  python predict.py --model_path ../logs/best_model.pth --image_dir ../data/processed/test/ --log_dir ../logs
+  ```
+- **Output:** Prediction results in `logs/predictions.txt`
 
-## 4. Implementation Plan
-- [x] Create data processing pipeline
-- [x] Develop model architecture
-- [x] Implement training framework
-- [x] Set up evaluation metrics
-
-## 5. Technical Considerations
-- [ ] Transfer learning from pre-trained models
-- [ ] Custom loss functions (style similarity, temporal consistency, design element preservation)
-- [ ] Contrastive learning for style evolution
-
-## 6. Evaluation Metrics
-- [x] Custom metrics for fashion trend prediction
-- [x] Visualization tools for style evolution, predicted trends, feature importance
-
-# Running Training with MPS (Apple Silicon)
-The training script will automatically use the MPS device if available. No changes are needed, but you can check the logs to confirm the device in use.
+## 6. Analysis
+- **Script:** `src/analysis/analyze_results.py`
+- **Command:**
+  ```bash
+  cd ../analysis
+  python analyze_results.py --results_path ../logs/predictions.txt --log_dir ../logs
+  ```
+- **Output:** Analysis report and visualizations in `logs/`
 
 # Project Structure
 ```
 DTP_project/
 ├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── features/
+│   ├── raw/         # Downloaded images
+│   ├── processed/   # Images split into train/val/test
+│   └── features/    # Extracted features split into train/val/test
 ├── models/
 │   ├── architectures/
 │   └── weights/
 ├── src/
 │   ├── data_processing/
 │   ├── training/
-│   └── evaluation/
+│   ├── evaluation/
+│   ├── prediction/
+│   └── analysis/
 ├── notebooks/
 └── tests/
 ```
+
+# Notes
+- The pipeline is fully functional from data collection to analysis.
+- The training script will automatically use the MPS device on Apple Silicon if available.
+- For troubleshooting or further improvements (e.g., data augmentation, advanced features, new designers), see the code comments and documentation.

@@ -48,11 +48,22 @@ def load_prediction_results(results_path):
             confidence = float(line.split(': ')[1].rstrip('%')) / 100
             current_result['confidence'] = confidence
         elif line.startswith('Probabilities:'):
-            probs = line.split(': ')[1]
-            not_trending_prob = float(probs.split(',')[0].split(': ')[1].rstrip('%')) / 100
-            trending_prob = float(probs.split(',')[1].split(': ')[1].rstrip('%')) / 100
-            current_result['not_trending_prob'] = not_trending_prob
-            current_result['trending_prob'] = trending_prob
+            try:
+                probs = line.split(': ', 1)[1]
+                prob_parts = probs.split(',')
+                if len(prob_parts) == 2 and ':' in prob_parts[0] and ':' in prob_parts[1]:
+                    not_trending_prob = float(prob_parts[0].split(': ')[1].rstrip('%')) / 100
+                    trending_prob = float(prob_parts[1].split(': ')[1].rstrip('%')) / 100
+                    current_result['not_trending_prob'] = not_trending_prob
+                    current_result['trending_prob'] = trending_prob
+                else:
+                    logging.warning(f"Malformed probabilities line: {line}")
+                    current_result['not_trending_prob'] = None
+                    current_result['trending_prob'] = None
+            except Exception as e:
+                logging.warning(f"Error parsing probabilities line: {line} ({e})")
+                current_result['not_trending_prob'] = None
+                current_result['trending_prob'] = None
     
     if current_result:
         results.append(current_result)
