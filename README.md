@@ -1,13 +1,8 @@
 # ML_projects
 
-This repository contains a collection of machine learning and data science projects. Each subfolder is a self-contained project with its own code, data, and documentation.
+This repository contains a collection of machine learning and data science projects 
 
 ## Projects Overview
-
-- **DTP_project**: Designer Trend Predictor
-  - Uses CNNs to predict future design trends based on a designer's previous works.
-  - Full pipeline: image scraping, data processing, feature extraction, model training, evaluation, prediction, and analysis.
-  - See `DTP_project/README.md` for detailed instructions and usage.
 
 - **LocationParser_project**: Location Extraction from Text
   - Reads a text file and creates a dictionary of locations found in the file using NLP techniques.
