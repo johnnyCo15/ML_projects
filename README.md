@@ -5,15 +5,12 @@ This repository contains a collection of machine learning and data science proje
 ## Projects Overview
 
 - **LocationParser_project**: Location Extraction from Text
-  - Reads a text file and creates a dictionary of locations found in the file using NLP techniques.
-  - Useful for extracting structured location data from unstructured text.
+  - Reads a text file and extracts location mentions using simple NLP.
+  - Files: `simpleFileReader.py`, `nlpReader.py`, example inputs in `example.txt`, `example2.txt`.
 
-- **Melbourne_project**: Melbourne Housing Price Prediction
-  - Analyzes Melbourne housing data to predict home prices using regression models.
-  - Includes data cleaning, feature engineering, and model evaluation.
-
-- **Async_practice**: Asynchronous Python Practice
-  - Practice scripts for learning and testing Python's async features.
+- **Melbourne_project**: Melbourne Housing Data Exploration
+  - Exploratory analysis and interpretation of the Melbourne housing dataset.
+  - Files: `dataInterpretation.py`, dataset `melb_data.csv`.
 
 ## Getting Started
 
@@ -22,7 +19,31 @@ This repository contains a collection of machine learning and data science proje
    git clone <repo-url>
    cd ML_projects
    ```
-2. Each project has its own setup and requirements. See the `README.md` inside each project folder for details.
+2. (Optional) Create and activate a virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. Each project has its own scripts. Minimal examples are below.
+
+### Running the projects
+
+- LocationParser_project
+  - Simple file reader (prints contents):
+    ```bash
+    python LocationParser_project/simpleFileReader.py LocationParser_project/example.txt
+    ```
+  - NLP reader (extracts locations; writes to `nlp_output.txt`):
+    ```bash
+    python LocationParser_project/nlpReader.py LocationParser_project/example.txt
+    ```
+
+- Melbourne_project
+  - Data interpretation over the bundled CSV:
+    ```bash
+    python Melbourne_project/dataInterpretation.py
+    ```
+    The script expects `Melbourne_project/melb_data.csv` to be present.
 
 ---
 
